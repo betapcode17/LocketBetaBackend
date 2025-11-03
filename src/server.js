@@ -1,21 +1,30 @@
-const express = require('express');
-const connectDB = require('./config/database');
-const cors = require('cors');
-const app = express();
+import express from "express";
+import cors from "cors";
+import connectDB from "./libs/db.js";
+// import chatRouter from "./routes/chat_router.js";
+// import messageRouter from "./routes/message_router.js";
+import dotenv from "dotenv";
+dotenv.config(); // Phải gọi trước khi connectDB
 
-connectDB();
+const PORT = process.env.PORT || 5000;
+
+const app = express();
 
 // middleware
 app.use(cors());
 app.use(express.json());
 
 // routes
-app.use('/api/chats', require('./routes/chat_router'));
-app.use('/api/messages', require('./routes/message_router'));
+// app.use("/api/chats", chatRouter);
+// app.use("/api/messages", messageRouter);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-
+// connect to DB and start server
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to database:", err);
+  });

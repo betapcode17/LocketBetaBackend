@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 # VSCode & History folders
 .history/
 # 
+node_modules/
+.history/
+.env
