@@ -1,33 +1,39 @@
 import express from 'express';
-import connectDB from './config/database.js';
+import connectDB from "./libs/db.js";
 import cors from 'cors';
 import chatRouter from './routes/chat_router.js';
 import messageRouter from './routes/message_router.js';
-import http from"http";
+import PostRoute from './routes/post_routes.js';
+import AuthRoute from './routes/auth_routes.js';
+import http from "http";
 import { WebSocketServer } from 'ws';
 import { handleWsConnection } from './controller/message_controller.js';
+import dotenv from 'dotenv';
 
+dotenv.config(); // Load env vars
+
+const PORT = process.env.PORT || 5000; // Chọn 5000 từ commit kia
 
 const app = express();
-connectDB();
 
-// middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// routes
+// Routes
 app.use('/api/chats', chatRouter);
 app.use('/api/messages', messageRouter);
+app.use('/api/posts', PostRoute);
+app.use('/api/auth', AuthRoute);
 
-
-// create http server from express
+// Create HTTP server from Express
 const server = http.createServer(app);
 const wss = new WebSocketServer({ noServer: true });
 var webSockets = {};
 
 server.on("upgrade", (request, socket, head) => {
-  // có thể kiểm tra auth header / cookie ở đây trước khi upgrade
-  // ví dụ: nếu không auth => socket.destroy()
+  // Có thể kiểm tra auth header / cookie ở đây trước khi upgrade
+  // Ví dụ: nếu không auth => socket.destroy()
   wss.handleUpgrade(request, socket, head, (ws) => {
     wss.emit("connection", ws, request);
   });
@@ -35,14 +41,15 @@ server.on("upgrade", (request, socket, head) => {
 
 wss.on('connection', (ws, req) => {
   handleWsConnection(ws, req, wss, webSockets);
-})
-
-const PORT = process.env.PORT || 8000;
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
-// });
-
-
-server.listen(PORT, () => {
-  console.log(`HTTP + WS server listening on port ${PORT}`);
 });
+
+// Connect DB and start server
+connectDB()
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`HTTP + WS server listening on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to database:", err);
+  });
