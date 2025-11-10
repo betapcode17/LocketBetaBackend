@@ -1,4 +1,4 @@
-import mongoose from "mongoose"; // Chuyển sang ES6 cho đồng bộ
+import mongoose from "mongoose";
 
 const MessageSchema = new mongoose.Schema({
   chatId: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
@@ -8,4 +8,4 @@ const MessageSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model("Message", MessageSchema);
+export default mongoose.model('Message', MessageSchema);
