@@ -94,8 +94,11 @@ export const handleWsConnection = async (ws, req, wss, webSockets) => {
         ws.close(1008, 'Missing userId');
         return;
     }
-    webSockets[userID] = ws; //thêm người dùng mới vào danh sách đang online
-    console.log('User ' + userID + ' Connected');
+    if(!webSockets[userID]) {
+        webSockets[userID] = new Set();
+    }
+    webSockets[userID].add(ws); //thêm người dùng mới vào danh sách đang online
+    console.log('User ' + userID + 'sockets =' + webSockets[userID].size + ' Connected');
 
     ws.on("message", async (message) => {
         //if there is any message
@@ -133,24 +136,32 @@ export const handleWsConnection = async (ws, req, wss, webSockets) => {
 
             // Update chat.lastMessage and updatedAt
             await Chat.findByIdAndUpdate(chatId, { lastMessage: saved._id, updatedAt: new Date() }).catch(() => {});
+            
+            const updatedChat = await Chat.findById(chatId).populate('lastMessage', 'content sender createdAt').populate('members', 'username avatar').lean();
 
             // Populate sender small payload
-            const populated = await Message.findById(saved._id).populate('sender', 'name avatar').lean();
+            const populated = await Message.findById(saved._id).populate('sender', 'username avatar').lean();
 
             // Broadcast to all connected members of the chat if known, else send only to sender
             const chat = await Chat.findById(chatId).select('members').lean().catch(() => null);
-            const payload = JSON.stringify({ event: 'message', message: populated });
+            const chatPayload = JSON.stringify({ event: 'message', message: populated });
+            const messagePayload = JSON.stringify({ event: 'chat_updated', chat: updatedChat });
 
             if (chat && Array.isArray(chat.members)) {
                 for (const memberId of chat.members) {
-                const client = webSockets[String(memberId)];
-                if (client && client.readyState === 1) { // 1 = OPEN
-                    client.send(payload);
-                }
+                    const clients = webSockets[String(memberId)];
+                    if (!clients) continue;
+                    for (const client of clients) {
+                      if (client && client.readyState === 1) { // 1 = OPEN
+                        client.send(chatPayload);
+                        client.send(messagePayload);
+                      }
+                    }
                 }
             } else {
                 // no chat member list => at least ack to sender
-                ws.send(payload);
+                ws.send(messagePayload);
+                ws.send(chatPayload);
             }
 
             // ack to the sender with saved id
@@ -162,8 +173,14 @@ export const handleWsConnection = async (ws, req, wss, webSockets) => {
     });
 
     ws.on("close", function () {
-        delete webSockets[userID];
-        console.log("User Disconnected: " + userID);
+        const sockets = webSockets[userID];
+        if (sockets) {
+            sockets.delete(ws);
+            if (sockets.size === 0) {
+                delete webSockets[userID];
+            }
+        }
+        console.log(`User Disconnected: ${userID}`);
     });
 
     ws.send(JSON.stringify({ status: 'connected', userId: userID }));
