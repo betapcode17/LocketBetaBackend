@@ -39,19 +39,19 @@ app.get("/", (req, res) => {
 // Create HTTP server & WebSocket server
 const server = http.createServer(app);
 const wss = new WebSocketServer({ noServer: true });
-const webSockets = {}; // Sửa: const thay var, global map { userId: ws }
+var webSockets = {}; // Sửa: const thay var, global map { userId: ws }
 
 // Handle WS upgrade (với basic auth example)
 server.on("upgrade", (request, socket, head) => {
   // Basic auth: Kiểm tra token từ query (e.g., ws://localhost:5000?token=abc)
-  const { url } = request;
-  const token = new URLSearchParams(url.split("?")[1]).get("token");
-  if (!token) {
-    // Nếu cần auth thực, verify JWT ở đây
-    socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
-    socket.destroy();
-    return;
-  }
+  // const { url } = request;
+  // const token = new URLSearchParams(url.split("?")[1]).get("token");
+  // if (!token) {
+  //   // Nếu cần auth thực, verify JWT ở đây
+  //   socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+  //   socket.destroy();
+  //   return;
+  // }
 
   wss.handleUpgrade(request, socket, head, (ws) => {
     wss.emit("connection", ws, request);
@@ -63,19 +63,19 @@ wss.on("connection", (ws, req) => {
   handleWsConnection(ws, req, wss, webSockets); // Pass webSockets để manage connections (e.g., userId -> ws)
 
   // Cleanup on disconnect
-  ws.on("close", () => {
-    console.log("❌ WS connection closed");
-    // Remove from webSockets map (implement in handleWsConnection nếu cần)
-    Object.keys(webSockets).forEach((userId) => {
-      if (webSockets[userId] === ws) {
-        delete webSockets[userId];
-      }
-    });
-  });
+  // ws.on("close", () => {
+  //   console.log("❌ WS connection closed");
+  //   // Remove from webSockets map (implement in handleWsConnection nếu cần)
+  //   Object.keys(webSockets).forEach((userId) => {
+  //     if (webSockets[userId] === ws) {
+  //       delete webSockets[userId];
+  //     }
+  //   });
+  // });
 
-  ws.on("error", (err) => {
-    console.error("❌ WS error:", err);
-  });
+  // ws.on("error", (err) => {
+  //   console.error("❌ WS error:", err);
+  // });
 });
 
 // Connect DB and start server
