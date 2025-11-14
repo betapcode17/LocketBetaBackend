@@ -12,7 +12,7 @@ export const getAllMessages = async (req, res) => {
             .sort({createdAt: 1});
         // console.log("Messages: " + messages);
         return res.json(messages);
-    } catch (e) {
+    } catch (e) {988
         return res.status(500).json({ error: err.message });
     }
 }
