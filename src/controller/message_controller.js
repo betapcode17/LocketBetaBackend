@@ -10,7 +10,7 @@ export const getAllMessages = async (req, res) => {
         const messages = await Message.find({chatId : chatId})
             .populate('sender', 'username avatar')
             .sort({createdAt: 1});
-        console.log("Messages: " + messages);
+        // console.log("Messages: " + messages);
         return res.json(messages);
     } catch (e) {
         return res.status(500).json({ error: err.message });
@@ -27,10 +27,11 @@ export const deleteMessage = async (req, res) => {
         if(!msg)
             return res.status(404).json({ error: 'Message not found' });
         // Optional: kiểm tra quyền (nếu client gửi userId hoặc bạn có middleware auth)
-        const requester = req.body.userId || req.query.userId;
-        if (requester && String(msg.sender) !== String(requester)) {
-        return res.status(403).json({ error: 'Not allowed to delete this message' });
-        }
+        // const requester = req.body.userId || req.query.userId;
+        // if (requester && String(msg.sender) !== String(requester)) {
+        //     return res.status(403).json({ error: 'Not allowed to delete this message' });
+        // }
+        console.log("Id của message cần xóa : " + messageId);
 
         await Message.findByIdAndDelete(messageId);
 
@@ -144,8 +145,8 @@ export const handleWsConnection = async (ws, req, wss, webSockets) => {
 
             // Broadcast to all connected members of the chat if known, else send only to sender
             const chat = await Chat.findById(chatId).select('members').lean().catch(() => null);
-            const chatPayload = JSON.stringify({ event: 'message', message: populated });
-            const messagePayload = JSON.stringify({ event: 'chat_updated', chat: updatedChat });
+            const messagePayload = JSON.stringify({ event: 'message', message: populated });
+            const chatPayload = JSON.stringify({ event: 'chat_updated', chat: updatedChat });
 
             if (chat && Array.isArray(chat.members)) {
                 for (const memberId of chat.members) {
