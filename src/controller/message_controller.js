@@ -10,7 +10,7 @@ exports.getAllMessagers = async (req, res) => {
             .populate('sender', 'username avatarUrl')
             .sort({createdAt: 1});
         return res.json(messages);
-    } catch (e) {
+    } catch (e) {988
         return res.status(500).json({ error: err.message });
     }
 }

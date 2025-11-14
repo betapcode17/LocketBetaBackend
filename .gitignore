@@ -143,4 +143,4 @@ vite.config.ts.timestamp-*
 # 
 node_modules/
 .history/
-.env
+*.env
