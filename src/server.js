@@ -10,11 +10,9 @@ import cors from "cors";
 import http from "http";
 import { WebSocketServer } from "ws";
 import { handleWsConnection } from "./controller/message_controller.js"; // Sửa path: controllers/ (plural, chuẩn convention)
-import PostRoute from "./routes/post_routes.js";
 import AuthRoute from "./routes/auth_routes.js";
 import FriendRoute from "./routes/friend_routes.js";
-import dotenv from "dotenv";
-dotenv.config(); // Phải gọi trước khi connectDB
+
 
 const PORT = process.env.PORT || 5000;
 
