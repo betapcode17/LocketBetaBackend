@@ -15,8 +15,6 @@ import AuthRoute from "./routes/auth_routes.js";
 import FriendRoute from "./routes/friend_routes.js";
 import RecommendationRouter from "./routes/recommendation_routes.js";
 import FriendRequestRouter from "./routes/friendRequest_routes.js";
-import dotenv from "dotenv";
-dotenv.config(); // Phải gọi trước khi connectDB
 
 const PORT = process.env.PORT || 5000;
 
