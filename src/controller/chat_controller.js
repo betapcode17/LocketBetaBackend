@@ -15,7 +15,7 @@ export const getAllChats = async (req, res) => {
       })
       .sort({ updatedAt: -1 })
       .lean();
-    console.log(chats);
+    // console.log(chats);
     return res.json({ chats });
   } catch (err) {
     console.error(err);
