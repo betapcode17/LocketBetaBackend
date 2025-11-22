@@ -13,8 +13,8 @@ import { WebSocketServer } from "ws";
 import { handleWsConnection } from "./controller/message_controller.js"; // Sửa path: controllers/ (plural, chuẩn convention)
 import AuthRoute from "./routes/auth_routes.js";
 import FriendRoute from "./routes/friend_routes.js";
-import RecommendationRouter from "./routes/recommendation_routes.js";
-import FriendRequestRouter from "./routes/friendRequest_routes.js";
+// import RecommendationRouter from "./routes/recommendation_routes.js";
+// import FriendRequestRouter from "./routes/friendRequest_routes.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -36,8 +36,8 @@ app.use("/api/chats", chatRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/auth", AuthRoute);
 app.use("/api/friends", FriendRoute);
-app.use("/api/friend-requests", FriendRequestRouter);
-app.use("/api/users/recommendation", RecommendationRouter);
+// app.use("/api/friend-requests", FriendRequestRouter);
+// app.use("/api/users/recommendation", RecommendationRouter);
 
 // connect to DB and start server
 

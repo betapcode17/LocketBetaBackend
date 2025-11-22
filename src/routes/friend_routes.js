@@ -13,11 +13,11 @@ const router = express.Router();
 
 router.get("/:userId", getFriends);
 router.get("/requests/:userId", getFriendRequests);
-router.get("/recommendation/:userId", getRecommendations);
-router.post("/add", addFriend);
-router.post("/request", sendFriendRequest);
-router.put("/request/accept/:requestId", acceptFriendRequest);
-router.put("/request/reject/:requestId", rejectFriendRequest);
+router.get("users/recommendation/:userId", getRecommendations);
+router.post("/", addFriend);
+router.post("/requests", sendFriendRequest);
+router.put("/requests/accept/:requestId", acceptFriendRequest);
+router.put("/requests/reject/:requestId", rejectFriendRequest);
 
 
 export default router;
