@@ -73,3 +73,25 @@ export const deletePhoto = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Lấy tất cả ảnh của 1 user theo userId
+export const getPhotosByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params; // userId được truyền từ URL
+
+    if (!userId) {
+      return res.status(400).json({ message: "Thiếu userId" });
+    }
+
+    // Tìm tất cả ảnh có userId tương ứng, sắp xếp mới nhất trước
+    const photos = await Photo.find({ userId }).sort({ timestamp: -1 });
+
+    res.status(200).json({
+      photos,
+      total: photos.length,
+    });
+  } catch (error) {
+    console.error("❌ Lỗi khi lấy ảnh theo userId:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
