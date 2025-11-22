@@ -6,6 +6,7 @@ import connectDB from "./libs/db.js";
 import PhotoRoute from "./routes/photo_routes.js"; // Photo routes (từ trước)
 import chatRouter from "./routes/chat_router.js"; // Thêm import cho chat
 import messageRouter from "./routes/message_router.js"; // Thêm import cho messages
+import userRouter from "./routes/user_routes.js";
 import cors from "cors";
 import http from "http";
 import { WebSocketServer } from "ws";
@@ -28,6 +29,7 @@ app.use(
 app.use(express.json({ limit: "10mb" })); // Giới hạn body size cho image upload nếu cần
 
 // Routes
+app.use("/api/users", userRouter);
 app.use("/api/photos", PhotoRoute);
 app.use("/api/chats", chatRouter);
 app.use("/api/messages", messageRouter);
